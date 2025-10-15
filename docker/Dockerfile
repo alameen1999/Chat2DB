@@ -1,11 +1,13 @@
-# Mirror based on jdk17
+# Build stage: compile the application and package the Spring Boot jar
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+WORKDIR /workspace
+COPY . .
+RUN mvn -pl chat2db-server/chat2db-server-web-start -am package -DskipTests
+
+# Runtime stage: run the packaged jar with JDK 17
 FROM openjdk:17
-# Define the default location when entering the container and the working location for subsequent operations.
 WORKDIR /app
-# Copy the jar package in the current directory to the /app directory of the docker container
-ADD chat2db-server/chat2db-server-web-start/target/chat2db-server-web-start.jar chat2db-server-web-start.jar
-# Copy the lib package in the current directory to the /app/lib directory of the docker container
-# ADD chat2db-server/chat2db-server-web-start/target/lib lib
+COPY --from=builder /workspace/chat2db-server/chat2db-server-web-start/target/chat2db-server-web-start.jar chat2db-server-web-start.jar
 # Let the current container expose 10824
 EXPOSE 10824
 # Run Jar
