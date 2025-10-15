@@ -2,7 +2,7 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /workspace
 COPY . .
-RUN mvn -pl chat2db-server/chat2db-server-web-start -am package -DskipTests
+RUN mvn -f chat2db-server/pom.xml -pl chat2db-server-web-start -am package -DskipTests
 
 # Runtime stage: run the packaged jar with JDK 17
 FROM openjdk:17
