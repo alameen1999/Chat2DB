@@ -1,7 +1,15 @@
 # Build stage: compile the application and package the Spring Boot jar
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /workspace
-COPY . .
+
+# Copy the Maven project files first to leverage Docker layer caching when
+# dependencies have not changed.
+COPY chat2db-server/pom.xml chat2db-server/pom.xml
+COPY chat2db-server/chat2db-server-web-start/pom.xml chat2db-server/chat2db-server-web-start/pom.xml
+
+# Copy the full server sources needed to build the Spring Boot web-start module.
+COPY chat2db-server chat2db-server
+
 RUN mvn -f chat2db-server/pom.xml -pl chat2db-server-web-start -am package -DskipTests
 
 # Runtime stage: run the packaged jar with JDK 17
